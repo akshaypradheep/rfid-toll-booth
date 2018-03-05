@@ -1,7 +1,7 @@
 //AccessControl.ino
 
 #define Ready 8
-#define Relay 10
+#define Relay 13
 #define Warning 9
 char tag[] ="12006202C4B6"; // Replace with your Tag ID
 char input[12];				
