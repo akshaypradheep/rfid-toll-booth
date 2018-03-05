@@ -49,6 +49,7 @@ void loop()
       sms.beginSMS(remoteNumber);
       sms.print("happy journy your balenc is ");
       sms.endSMS(); 
+      blnc--;
 		}
 		if(match == 1 && blnc <= 0)
 		{
