@@ -1,60 +1,66 @@
-//AccessControl.ino
+//=======================================gsm================================================
 
-#define Ready 8
-#define Relay 13
-#define Warning 9
-char tag[] ="12006202C4B6"; // Replace with your Tag ID
+#include <GSM.h>
+#include <Servo.h>
+GSM gsmAccess; 
+GSM_SMS sms;
+char remoteNumber[20]= "9633184689";
+//============================================================================================
+char tag[20] ="12006202C4B6"; 
 char input[12];				
-int count = 0;				
+int count = 0;
+int blnc = 10;		
 boolean match = 0;			
 void setup()
 {
 	Serial.begin(9600);
-        pinMode(Ready,OUTPUT);		
-	pinMode(Relay,OUTPUT);	
-	pinMode(Warning,OUTPUT); 
+  
 }
 void loop()
 {        
-        digitalWrite(Ready,HIGH);
-  
-	if(Serial.available())// check serial data ( RFID reader)
+  //======================================= READ The data =============================================
+	if(Serial.available())
 	{        
-    digitalWrite(Ready,LOW);
-		count = 0; // Reset the counter to zero
+		count = 0; 
 		while(Serial.available() && count < 12) 
 		{
 			input[count] = Serial.read(); 
 			count++;
 			delay(5);
 		}
-		if(count == 12) // 
+  //============================================= check wether the rfid is match =======================
+		if(count == 12)  
 		{
-			count =0; // reset counter varibale to 0
+			count =0;
 			match = 1;
 			while(count<12 && match !=0)  
 			{
 				if(input[count]==tag[count])
-				match = 1; 
+				  match = 1; 
 				else
-				match= 0;
-				count++; 
+				  match= 0;
+				  count++; 
 			}
 		}
-		if(match == 1) 
+  // ===================================================================================================
+		if(match == 1 && blnc > 0) 
 		{
 			Serial.println("Congratulation Access Allowed");
-			digitalWrite(Relay,HIGH);
-			delay (5000);				
-			digitalWrite (Relay,LOW);
+      
+      sms.beginSMS(remoteNumber);
+      sms.print("happy journy your balenc is ");
+      sms.endSMS(); 
 		}
-		else
+		if(match == 1 && blnc <= 0)
 		{
-			Serial.println("Access Denied"); // Incorrect Tag Message
-			digitalWrite(Warning,HIGH);
-			delay(500);
-			digitalWrite(Warning,LOW);
+			Serial.println("recharge your account"); // Incorrect Tag Message
+      sms.beginSMS(remoteNumber);
+      sms.print("recharge your account");
+      sms.endSMS(); 
 		}
+    else{
+      Serial.print("acces denined");
+    }
 		for(count=0; count<12; count++) 
 		{
 			input[count]= 'F';
@@ -62,3 +68,6 @@ void loop()
 		count = 0;
 	}
 }
+
+ 
+
